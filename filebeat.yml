@@ -1,0 +1,28 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/kolla/nova/nova-api.log
+      - /var/log/kolla/nova/nova-compute.log
+      - /var/log/kolla/nova/nova-scheduler.log
+      - /var/log/kolla/nova/nova-conductor.log
+    fields:
+      service.name: nova
+      node_role: controller
+    fields_under_root: true
+    multiline.pattern: '^[[:space:]]'
+    multiline.negate: false
+    multiline.match: after
+
+output.elasticsearch:
+  hosts: ["http://192.168.146.1:9200"]
+  username: "elastic"
+  index: "nova-%{+yyyy.MM.dd}"
+
+setup.kibana:
+  host: "http://192.168.146.1:5601"
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_locale: ~
