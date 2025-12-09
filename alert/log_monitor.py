@@ -17,14 +17,7 @@ from alert.discord_notifier import DiscordNotifier
 
 
 class LogMonitor:    
-    def __init__(self, es_host="http://192.168.146.1:9200", 
-                 es_username="elastic", 
-                 es_password="",
-                 index_pattern="nova-*",    
-                 output_dir="anomaly_results",
-                 discord_webhook_url="",
-                 discord_enabled=True,
-                 save_json=True):
+    def __init__(self, es_host, index_pattern, output_dir, discord_webhook_url, discord_enabled=True, save_json=True):
         self.es_host = es_host
         self.index_pattern = index_pattern
         self.output_dir = output_dir
@@ -260,9 +253,6 @@ class LogMonitor:
                 print(f"Error saving anomalies: {e}")
     
     def run_detection_cycle(self):
-        """
-        Run one detection cycle: fetch logs -> detect -> save anomalies
-        """
         print("\n" + "="*80)
         print(f"Starting detection cycle at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("="*80)
@@ -335,10 +325,10 @@ class LogMonitor:
 
 def main():
     # Configuration
-    ES_HOST = "http://192.168.146.1:9200"
-    ES_USERNAME = "elastic"
-    ES_PASSWORD = ""
-    INDEX_PATTERN = "nova-*"
+    ES_HOST = os.getenv("ES_HOST", "http://localhost:9200")
+    ES_USERNAME = os.getenv("ES_USERNAME", "elastic")
+    ES_PASSWORD = os.getenv("ES_PASSWORD", "")
+    INDEX_PATTERN = os.getenv("ES_INDEX_PATTERN", "nova-*")
     OUTPUT_DIR = "anomaly_results"
     INTERVAL_MINUTES = 3
     
