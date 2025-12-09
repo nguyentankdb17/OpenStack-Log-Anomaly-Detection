@@ -17,8 +17,10 @@ from alert.discord_notifier import DiscordNotifier
 
 
 class LogMonitor:    
-    def __init__(self, es_host, index_pattern, output_dir, discord_webhook_url, discord_enabled=True, save_json=True):
+    def __init__(self, es_host, es_username, es_password, index_pattern, output_dir, discord_webhook_url, discord_enabled=True, save_json=True):
         self.es_host = es_host
+        self.es_username = es_username
+        self.es_password = es_password
         self.index_pattern = index_pattern
         self.output_dir = output_dir
         self.save_json = save_json
