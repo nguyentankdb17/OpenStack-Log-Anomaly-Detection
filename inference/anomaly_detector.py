@@ -65,7 +65,7 @@ class AnomalyDetector:
                 'is_anomaly': False,
                 'reconstruction_error': 0.0,
                 'confidence': 0.0,
-                'message': 'Sequence too short (minimum 4 events required)'
+                'message': 'Sequence too short (minimum 2 events required)'
             }
         
         error = self.calculate_reconstruction_error(sequence)
