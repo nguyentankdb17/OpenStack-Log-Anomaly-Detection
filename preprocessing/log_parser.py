@@ -1,12 +1,11 @@
 from logparser.Drain import LogParser
 
-input_dir = 'data/'
+input_dir = '../data/'
 output_dir = 'result/'
-log_file = 'openstack_abnormal.log'
+log_file = 'openstack_test.log'
 
 log_format = '<Logfile> <Date> <Time> <Pid> <Level> <Component> \[<Context>\] <Content>'
 
-# Regex patterns for masking - removed the one that was catching status codes
 regex = [
     r'\breq-[0-9a-f]{8,}\b',
     r'\breq-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b',
@@ -17,12 +16,12 @@ regex = [
     r'\b\d{1,3}(?:\.\d{1,3}){3}\b',  # IP addresses
     r'\b\d{4}-\d{2}-\d{2}\b',  # Dates
     r'\b\d{2}:\d{2}:\d{2}(?:\.\d+)?\b',  # Times
+    r'\b\d+\.\d+\b',  # Decimal numbers
     r'\b\d+(?:\.\d+)?\s*MB\b',  # Memory MB
     r'\b\d+(?:\.\d+)?\s*GB\b',  # Memory GB
     r'\b\d+\s*v?CPUs?\b',  # CPUs
     r'\b\d+(?:\.\d+)?\s*seconds?\b',  # Seconds
-    # Only mask large numbers (4+ digits), but be more specific
-    r'\b\d{4,}\b(?!\s*\])',  # Numbers with 4+ digits (not followed by ])
+    r'\b\d{4,}\b(?!\s*\])'
 ]
 
 st = 0.3
