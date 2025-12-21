@@ -7,8 +7,7 @@ from .model import LSTMAutoencoder
 
 
 class AnomalyDetector:
-    def __init__(self, model_path='model/lstm_autoencoder_model.pth', 
-                 threshold=0.280038, max_seq_len=100, vocab_size=36):
+    def __init__(self, model_path='model/lstm_autoencoder_model.pth', threshold=0.280038, max_seq_len=100, vocab_size=36):
         self.vocab_size = vocab_size
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.threshold = threshold
@@ -60,12 +59,12 @@ class AnomalyDetector:
             return float(error)
     
     def predict_single_sequence(self, sequence):
-        if len(sequence) < 2:
+        if len(sequence) < 3:
             return {
                 'is_anomaly': False,
                 'reconstruction_error': 0.0,
                 'confidence': 0.0,
-                'message': 'Sequence too short (minimum 2 events required)'
+                'message': 'Sequence too short (minimum 3 events required)'
             }
         
         error = self.calculate_reconstruction_error(sequence)
