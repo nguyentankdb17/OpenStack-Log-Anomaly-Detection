@@ -12,4 +12,4 @@ This repository contains the experimental source code for the research on log-ba
 └── preprocessing/    # Contains data processing script
 ```
 ## Demo
-Video demo: [Watch here](./assets/demo.mp4)
+Video demo: [Watch here]([./assets/demo.mp4](https://drive.google.com/file/d/1eN4BbsdXDHGc6KvyNkYwpfATLNxKqVFz/view?usp=drive_link))
