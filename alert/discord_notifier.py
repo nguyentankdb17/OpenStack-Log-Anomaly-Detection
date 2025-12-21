@@ -101,7 +101,7 @@ class DiscordNotifier:
                 first_log = anomaly['log_entries'][0]
                 level = first_log.get('Level', 'N/A')
                 component = first_log.get('Component', 'N/A')
-                content = first_log.get('Content', '')[:100]
+                content = first_log.get('Content', '')  
                 
                 value_text += f"\n**Level:** {level}\n**Component:** {component}"
                 if content:
@@ -130,27 +130,3 @@ class DiscordNotifier:
             print(f"Failed to send Discord alert")
         
         return success
-    
-    def send_startup_notification(self, monitor_info):
-        embed = {
-            "title": "✅ OpenStack Log Monitor Started",
-            "color": 0x00FF00,
-            "timestamp": datetime.utcnow().isoformat(),
-            "fields": [
-                {
-                    "name": "🔧 Configuration",
-                    "value": (
-                        f"**Elasticsearch:** {monitor_info.get('es_host', 'N/A')}\n"
-                        f"**Index:** {monitor_info.get('index_pattern', 'N/A')}\n"
-                        f"**Interval:** {monitor_info.get('interval', 3)} minutes\n"
-                        f"**Threshold:** {monitor_info.get('threshold', 0.28)}"
-                    ),
-                    "inline": False
-                }
-            ],
-            "footer": {
-                "text": "🔔 You will receive alerts when anomalies are detected"
-            }
-        }
-        
-        return self.send_message(embeds=[embed])

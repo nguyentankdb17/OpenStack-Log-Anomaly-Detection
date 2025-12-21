@@ -54,7 +54,6 @@ class LogMonitor:
             print(f" Error connecting to Elasticsearch: {e}")
             print(f" Verify: curl {es_host}")
         
-        # Initialize anomaly detector
         try:
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(BASE_DIR, 'model', 'lstm_autoencoder_model.pth')
@@ -70,7 +69,6 @@ class LogMonitor:
             print(f"Error initializing detector: {e}")
             self.detector = None
         
-        # Initialize log processor
         try:
             self.log_processor = OpenStackLogProcessor()
             print("Log processor initialized")
@@ -78,13 +76,11 @@ class LogMonitor:
             print(f"Error initializing log processor: {e}")
             self.log_processor = None
         
-        # Initialize Discord notifier
         self.discord = DiscordNotifier(
             webhook_url=discord_webhook_url,
             enabled=discord_enabled
         )
         
-        # Track last query time
         self.last_query_time = None
     
     def fetch_logs_from_elasticsearch(self, time_range_minutes=3):
@@ -134,7 +130,6 @@ class LogMonitor:
                 print("No new logs found in this time window")
                 return None
             
-            # Extract log messages
             log_lines = []
             for hit in hits:
                 source = hit['_source']
@@ -201,7 +196,6 @@ class LogMonitor:
                     
                     anomalies.append(anomaly_data)
             
-            # Calculate summary
             total_sequences = len(predictions)
             total_anomalies = len(anomalies)
             normal_sequences = total_sequences - total_anomalies
@@ -233,18 +227,14 @@ class LogMonitor:
             print("No anomalies to save")
             return
         
-        # Send Discord alert
         self.discord.send_anomaly_alert(result)
         
-        # Save to JSON if enabled
         if self.save_json:
             try:
-                # Generate filename with timestamp
                 timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
                 filename = f"anomalies_{timestamp}.json"
                 filepath = os.path.join(self.output_dir, filename)
                 
-                # Save to JSON
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(result, f, indent=2, ensure_ascii=False, default=str)
                 
@@ -259,21 +249,18 @@ class LogMonitor:
         print(f"Starting detection cycle at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("="*80)
         
-        # Fetch logs
         log_text = self.fetch_logs_from_elasticsearch(time_range_minutes=3)
         
         if log_text is None:
             print("No logs to process in this cycle")
             return
         
-        # Detect anomalies
         result = self.detect_anomalies(log_text)
         
         if result is None:
             print("Detection failed")
             return
         
-        # Save if anomalies found
         if len(result.get('anomalies', [])) > 0:
             self.save_anomalies(result)
         else:
@@ -285,11 +272,6 @@ class LogMonitor:
         print("\n" + "="*80)
         print("OpenStack Log Anomaly Detection Monitor")
         print("="*80)
-        print(f"Elasticsearch: {self.es_host}")
-        print(f"Index pattern: {self.index_pattern}")
-        print(f"Interval: {interval_minutes} minutes")
-        print(f"Output directory: {self.output_dir}")
-        print("="*80)
         
         if not self.es_connected:
             print("\n Cannot start: Elasticsearch not connected")
@@ -299,19 +281,9 @@ class LogMonitor:
             print("\n Cannot start: Detector or log processor not initialized")
             return
         
-        # Send startup notification
-        self.discord.send_startup_notification({
-            'es_host': self.es_host,
-            'index_pattern': self.index_pattern,
-            'interval': interval_minutes,
-            'threshold': self.detector.threshold
-        })
-        
-        # Run immediately on start
         print("\nRunning initial detection cycle...")
         self.run_detection_cycle()
         
-        # Schedule periodic runs
         schedule.every(interval_minutes).minutes.do(self.run_detection_cycle)
         
         print(f"\n Scheduler started. Will run every {interval_minutes} minutes.")
@@ -326,7 +298,6 @@ class LogMonitor:
 
 
 def main():
-    # Configuration
     ES_HOST = os.getenv("ES_HOST", "http://localhost:9200")
     ES_USERNAME = os.getenv("ES_USERNAME", "elastic")
     ES_PASSWORD = os.getenv("ES_PASSWORD", "")
@@ -334,12 +305,10 @@ def main():
     OUTPUT_DIR = "anomaly_results"
     INTERVAL_MINUTES = 3
     
-    # Discord Configuration
     DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "")
     DISCORD_ENABLED = os.getenv("DISCORD_ENABLED", "true").lower() == "true"
     SAVE_JSON = os.getenv("SAVE_JSON", "true").lower() == "true"
     
-    # Create and start monitor
     monitor = LogMonitor(
         es_host=ES_HOST,
         es_username=ES_USERNAME,
